@@ -39,6 +39,7 @@
       z-index: 10;
     }
     header h1 { font-size: 1.15rem; font-weight: 700; color: #1f2328; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
     header button {
       background: #3b82d4;
       color: #fff;
@@ -50,6 +51,35 @@
       cursor: pointer;
     }
     header button:hover { background: #2f6bbf; }
+    .btn-settings {
+      background: #fff !important;
+      color: #57606a !important;
+      border: 1px solid #e5e7eb !important;
+      font-weight: 400 !important;
+      font-size: 18px !important;
+      padding: 4px 10px !important;
+      line-height: 1;
+    }
+    .btn-settings:hover { background: #f7f8fa !important; color: #1f2328 !important; }
+
+    /* ── Sync status ── */
+    .sync-status {
+      font-size: 12px;
+      color: #57606a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .sync-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #57606a;
+      flex-shrink: 0;
+    }
+    .sync-dot.ok   { background: #2da44e; }
+    .sync-dot.err  { background: #c0392b; }
+    .sync-dot.busy { background: #e6a817; }
 
     /* ── Layout ── */
     .container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
@@ -213,6 +243,12 @@
     .form-group input:focus,
     .form-group textarea:focus { outline: none; border-color: #3b82d4; }
 
+    .form-hint {
+      font-size: 12px;
+      color: #57606a;
+      margin-top: 4px;
+    }
+
     /* ── Image upload ── */
     .img-upload-area {
       border: 2px dashed #e5e7eb;
@@ -367,13 +403,36 @@
       white-space: pre-wrap;
       line-height: 1.7;
     }
+
+    /* ── Settings notice box ── */
+    .notice {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 16px;
+    }
+    .notice.info {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1e40af;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>🍽 Mine Oppskrifter</h1>
-  <button id="newRecipeBtn">+ Ny oppskrift</button>
+  <div class="header-actions">
+    <span class="sync-status" id="syncStatus">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncLabel">Ikke koblet til</span>
+    </span>
+    <button class="btn-settings" id="settingsBtn" title="GitHub-innstillinger">⚙</button>
+    <button id="newRecipeBtn">+ Ny oppskrift</button>
+  </div>
 </header>
 
 <div class="container">
@@ -382,6 +441,47 @@
   </div>
   <div class="filter-bar" id="filterBar"></div>
   <div class="recipe-grid" id="recipeGrid"></div>
+</div>
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal" style="max-width:500px;">
+    <button class="close-btn" id="closeSettingsBtn">✕</button>
+    <div class="modal-title">GitHub-innstillinger</div>
+
+    <div class="notice info">
+      Oppskriftene lagres som <strong>recipes.json</strong> i GitHub-repositoriet ditt.
+      Du trenger et Personal Access Token med <strong>repo</strong>-tilgang.
+    </div>
+
+    <div class="form-group">
+      <label for="ghOwner">GitHub-bruker eller organisasjon</label>
+      <input type="text" id="ghOwner" placeholder="F.eks. mstrandos-hub" />
+    </div>
+
+    <div class="form-group">
+      <label for="ghRepo">Repository-navn</label>
+      <input type="text" id="ghRepo" placeholder="F.eks. oppskrifter" />
+    </div>
+
+    <div class="form-group">
+      <label for="ghToken">Personal Access Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+      <div class="form-hint">
+        Opprett på <strong>github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong>.
+        Gi tilgang til <em>Contents</em> (read &amp; write) for dette repoet.
+        Token lagres kun lokalt i nettleseren din.
+      </div>
+    </div>
+
+    <div id="settingsError" style="color:#c0392b; font-size:13px; margin-bottom:8px; display:none;"></div>
+
+    <div class="form-actions">
+      <button class="btn-danger" id="clearGhBtn">Fjern tilkobling</button>
+      <button class="btn-secondary" id="cancelSettingsBtn">Avbryt</button>
+      <button class="btn-primary" id="saveSettingsBtn">Lagre og koble til</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ FORM MODAL ═══ -->
@@ -467,40 +567,112 @@
 </div>
 
 <script>
-  // ── Storage helpers ──────────────────────────────────────────────────────
-  const STORAGE_KEY = 'oppskrifter_v1';
+  // ── Constants ────────────────────────────────────────────────────────────
+  const STORAGE_KEY    = 'oppskrifter_v1';
+  const GH_OWNER_KEY   = 'gh_owner';
+  const GH_REPO_KEY    = 'gh_repo';
+  const GH_TOKEN_KEY   = 'gh_token';
+  const GH_SHA_KEY     = 'gh_recipes_sha';
+  const GH_FILE_PATH   = 'recipes.json';
 
-  function loadRecipes() {
+  // ── GitHub config helpers ────────────────────────────────────────────────
+  function ghConfig() {
+    return {
+      owner: localStorage.getItem(GH_OWNER_KEY) || '',
+      repo:  localStorage.getItem(GH_REPO_KEY)  || '',
+      token: localStorage.getItem(GH_TOKEN_KEY) || '',
+    };
+  }
+
+  function ghConfigured() {
+    const c = ghConfig();
+    return !!(c.owner && c.repo && c.token);
+  }
+
+  // ── Local storage helpers ────────────────────────────────────────────────
+  function loadRecipesLocal() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
   }
 
-  function saveRecipes(recipes) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+  function saveRecipesLocal(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  // ── GitHub API helpers ───────────────────────────────────────────────────
+  async function ghRequest(path, method, body) {
+    const { owner, repo, token } = ghConfig();
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+    const opts = {
+      method,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `GitHub API ${res.status}`);
+    }
+    return res.status === 204 ? null : res.json();
   }
 
-  function formatDate(iso) {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-');
-    return `${d}.${m}.${y}`;
+  async function ghGetRecipes() {
+    const data = await ghRequest(GH_FILE_PATH, 'GET');
+    localStorage.setItem(GH_SHA_KEY, data.sha);
+    const json = atob(data.content.replace(/\n/g, ''));
+    return JSON.parse(json);
+  }
+
+  async function ghPutRecipes(list) {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+    const sha = localStorage.getItem(GH_SHA_KEY) || undefined;
+    const body = {
+      message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`,
+      content,
+    };
+    if (sha) body.sha = sha;
+    const res = await ghRequest(GH_FILE_PATH, 'PUT', body);
+    if (res && res.content && res.content.sha) {
+      localStorage.setItem(GH_SHA_KEY, res.content.sha);
+    }
+  }
+
+  // ── Sync status UI ───────────────────────────────────────────────────────
+  const syncDot   = document.getElementById('syncDot');
+  const syncLabel = document.getElementById('syncLabel');
+
+  function setSyncStatus(state, text) {
+    syncDot.className = 'sync-dot' + (state ? ` ${state}` : '');
+    syncLabel.textContent = text;
   }
 
   // ── State ────────────────────────────────────────────────────────────────
-  let recipes = loadRecipes();
-  let editingId = null;
-  let pendingImages = [];
-  let detailRecipeId = null;
-  let activeIngFilter = null; // currently selected main ingredient filter
+  let recipes         = loadRecipesLocal();
+  let editingId       = null;
+  let pendingImages   = [];
+  let detailRecipeId  = null;
+  let activeIngFilter = null;
 
   // ── DOM refs ─────────────────────────────────────────────────────────────
   const recipeGrid      = document.getElementById('recipeGrid');
   const searchInput     = document.getElementById('searchInput');
   const filterBar       = document.getElementById('filterBar');
   const newRecipeBtn    = document.getElementById('newRecipeBtn');
+  const settingsBtn     = document.getElementById('settingsBtn');
+
+  const settingsModal    = document.getElementById('settingsModal');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const cancelSettingsBtn= document.getElementById('cancelSettingsBtn');
+  const saveSettingsBtn  = document.getElementById('saveSettingsBtn');
+  const clearGhBtn       = document.getElementById('clearGhBtn');
+  const ghOwnerInput     = document.getElementById('ghOwner');
+  const ghRepoInput      = document.getElementById('ghRepo');
+  const ghTokenInput     = document.getElementById('ghToken');
+  const settingsError    = document.getElementById('settingsError');
 
   const formModal       = document.getElementById('formModal');
   const formTitle       = document.getElementById('formTitle');
@@ -530,6 +702,64 @@
   const detailInstr     = document.getElementById('detailInstructions');
   const detailIngSec    = document.getElementById('detailIngSection');
   const detailInstSec   = document.getElementById('detailInstSection');
+
+  // ── Utility ──────────────────────────────────────────────────────────────
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${d}.${m}.${y}`;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Init: load from GitHub if configured ─────────────────────────────────
+  async function initLoad() {
+    if (!ghConfigured()) {
+      setSyncStatus('', 'Ikke koblet til GitHub');
+      renderFilterBar();
+      renderGrid();
+      return;
+    }
+
+    setSyncStatus('busy', 'Henter oppskrifter…');
+    try {
+      const ghRecipes = await ghGetRecipes();
+      recipes = ghRecipes;
+      saveRecipesLocal(recipes);
+      setSyncStatus('ok', 'Synkronisert');
+    } catch (e) {
+      // File may not exist yet — that's fine
+      if (e.message && e.message.includes('Not Found')) {
+        setSyncStatus('ok', 'Klar (ingen fil ennå)');
+      } else {
+        setSyncStatus('err', 'Feil ved henting');
+        console.error('GitHub load error:', e);
+      }
+    }
+    renderFilterBar();
+    renderGrid();
+  }
+
+  // ── Persist: save locally + push to GitHub ────────────────────────────────
+  async function persistRecipes(list) {
+    saveRecipesLocal(list);
+    if (!ghConfigured()) return;
+
+    setSyncStatus('busy', 'Lagrer til GitHub…');
+    try {
+      await ghPutRecipes(list);
+      setSyncStatus('ok', 'Lagret til GitHub ✓');
+    } catch (e) {
+      setSyncStatus('err', 'Feil ved lagring til GitHub');
+      console.error('GitHub save error:', e);
+    }
+  }
 
   // ── Render filter bar ─────────────────────────────────────────────────────
   function renderFilterBar() {
@@ -606,10 +836,6 @@
     });
   }
 
-  function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
   // ── Form helpers ─────────────────────────────────────────────────────────
   function addIngredientRow(value = '') {
     const row = document.createElement('div');
@@ -633,6 +859,73 @@
       uploadPreview.appendChild(img);
     });
     uploadHint.style.display = pendingImages.length ? 'none' : '';
+  }
+
+  // ── Settings modal ────────────────────────────────────────────────────────
+  function openSettings() {
+    const c = ghConfig();
+    ghOwnerInput.value = c.owner;
+    ghRepoInput.value  = c.repo;
+    ghTokenInput.value = c.token;
+    settingsError.style.display = 'none';
+    settingsModal.classList.add('open');
+  }
+
+  function closeSettings() {
+    settingsModal.classList.remove('open');
+  }
+
+  async function handleSaveSettings() {
+    const owner = ghOwnerInput.value.trim();
+    const repo  = ghRepoInput.value.trim();
+    const token = ghTokenInput.value.trim();
+
+    if (!owner || !repo || !token) {
+      settingsError.textContent = 'Fyll ut alle feltene.';
+      settingsError.style.display = '';
+      return;
+    }
+
+    // Test the connection
+    settingsError.style.display = 'none';
+    saveSettingsBtn.textContent = 'Tester…';
+    saveSettingsBtn.disabled = true;
+
+    try {
+      const testUrl = `https://api.github.com/repos/${owner}/${repo}`;
+      const res = await fetch(testUrl, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      });
+      if (!res.ok) throw new Error(`Fant ikke repoet (${res.status}). Sjekk brukernavn, repo og token.`);
+    } catch (e) {
+      settingsError.textContent = e.message;
+      settingsError.style.display = '';
+      saveSettingsBtn.textContent = 'Lagre og koble til';
+      saveSettingsBtn.disabled = false;
+      return;
+    }
+
+    localStorage.setItem(GH_OWNER_KEY, owner);
+    localStorage.setItem(GH_REPO_KEY,  repo);
+    localStorage.setItem(GH_TOKEN_KEY, token);
+    localStorage.removeItem(GH_SHA_KEY);
+
+    saveSettingsBtn.textContent = 'Lagre og koble til';
+    saveSettingsBtn.disabled = false;
+    closeSettings();
+
+    // Re-init: fetch recipes from GitHub
+    await initLoad();
+  }
+
+  function handleClearGh() {
+    if (!confirm('Fjerne GitHub-tilkoblingen? Oppskrifter forblir lokalt i nettleseren.')) return;
+    localStorage.removeItem(GH_OWNER_KEY);
+    localStorage.removeItem(GH_REPO_KEY);
+    localStorage.removeItem(GH_TOKEN_KEY);
+    localStorage.removeItem(GH_SHA_KEY);
+    setSyncStatus('', 'Ikke koblet til GitHub');
+    closeSettings();
   }
 
   // ── Open / close form ────────────────────────────────────────────────────
@@ -683,7 +976,6 @@
 
     detailTitle.textContent = r.name;
 
-    // Meta row (main ingredient, date, location)
     detailMeta.innerHTML = '';
     if (r.mainIngredient) {
       const s = document.createElement('span');
@@ -702,7 +994,6 @@
     }
     detailMeta.style.display = detailMeta.children.length ? '' : 'none';
 
-    // Gallery
     detailGallery.innerHTML = '';
     if (r.images && r.images.length) {
       r.images.forEach(src => {
@@ -716,7 +1007,6 @@
       detailGallery.style.display = 'none';
     }
 
-    // Ingredients
     const ings = (r.ingredients || []).filter(Boolean);
     if (ings.length) {
       detailIngList.innerHTML = ings.map(i => `<li>${escHtml(i)}</li>`).join('');
@@ -725,7 +1015,6 @@
       detailIngSec.style.display = 'none';
     }
 
-    // Instructions
     if (r.instructions && r.instructions.trim()) {
       detailInstr.textContent = r.instructions;
       detailInstSec.style.display = '';
@@ -742,10 +1031,13 @@
   }
 
   // ── Save ─────────────────────────────────────────────────────────────────
-  function handleSave() {
+  async function handleSave() {
     const name = fieldName.value.trim();
     if (!name) { fieldName.focus(); fieldName.style.borderColor = '#d33'; return; }
     fieldName.style.borderColor = '';
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Lagrer…';
 
     const recipe = {
       id: editingId || uid(),
@@ -766,18 +1058,22 @@
       recipes.unshift(recipe);
     }
 
-    saveRecipes(recipes);
+    await persistRecipes(recipes);
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Lagre';
+
     closeForm();
     renderFilterBar();
     renderGrid(searchInput.value);
   }
 
   // ── Delete ───────────────────────────────────────────────────────────────
-  function handleDelete() {
+  async function handleDelete() {
     if (!editingId) return;
     if (!confirm('Vil du slette denne oppskriften?')) return;
     recipes = recipes.filter(x => x.id !== editingId);
-    saveRecipes(recipes);
+    await persistRecipes(recipes);
     closeForm();
     closeDetail();
     renderFilterBar();
@@ -799,10 +1095,17 @@
       };
       reader.readAsDataURL(file);
     });
-    fileInput.value = ''; // allow re-selecting same file
+    fileInput.value = '';
   });
 
   // ── Event listeners ──────────────────────────────────────────────────────
+  settingsBtn.addEventListener('click', openSettings);
+  closeSettingsBtn.addEventListener('click', closeSettings);
+  cancelSettingsBtn.addEventListener('click', closeSettings);
+  saveSettingsBtn.addEventListener('click', handleSaveSettings);
+  clearGhBtn.addEventListener('click', handleClearGh);
+  settingsModal.addEventListener('click', e => { if (e.target === settingsModal) closeSettings(); });
+
   newRecipeBtn.addEventListener('click', () => openForm());
   closeFormBtn.addEventListener('click', closeForm);
   cancelBtn.addEventListener('click', closeForm);
@@ -820,13 +1123,11 @@
 
   searchInput.addEventListener('input', () => renderGrid(searchInput.value));
 
-  // Close modals on overlay click
   formModal.addEventListener('click', e => { if (e.target === formModal) closeForm(); });
   detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetail(); });
 
   // ── Init ─────────────────────────────────────────────────────────────────
-  renderFilterBar();
-  renderGrid();
+  initLoad();
 
   // ── Service Worker ────────────────────────────────────────────────────────
   if ('serviceWorker' in navigator) {
