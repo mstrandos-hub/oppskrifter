@@ -1,5 +1,22 @@
 [
   {
+    "id": "mrc9gymojn22f3j3le",
+    "name": "Kylling og pasta",
+    "mainIngredient": "Kylling",
+    "date": "2026-07-08",
+    "location": "Hytta",
+    "ingredients": [
+      "Kyllingbryst",
+      "Pasta",
+      "Løk og hvitløk",
+      "Fløte",
+      "Kyllingkraft"
+    ],
+    "instructions": "1.  Kok pastaen: Kok pasta i godt saltet vann etter anvisningen på pakken. Ta vare på litt pastavann før du heller av.\n2.  Stek kyllingen: Skjær kyllingbrystet i strimler eller terninger. Krydre med salt og pepper. Varm olje/smør i en stor stekepanne på middels-høy varme. Stek kyllingen til den er gyllen og gjennomstekt (ca. 5–7 minutter). Ta den ut av pannen og sett til side.\n3.  Lag sausen: I samme panne (bruk fettet fra kyllingen), stek løk og hvitløk til det er mykt og duftende (ca. 2–3 minutter). Hell i fløte og kyllingkraft. La det småkoke i 3–4 minutter til sausen tykner litt. Rør inn revet ost så den smelter. Smak til med salt, pepper og urter.\n4.  Sett sammen: Legg kyllingen tilbake i pannen. Vend inn den kokte pastaen (og litt pastavann hvis sausen er for tykk). La alt bli varmt sammen i 1–2 minutter.\n5.  Server: Fordel på tallerkener. Dryss over ekstra parmesan, frisk basilikum og gjerne litt sort pepper.",
+    "images": [],
+    "updatedAt": 1783526235216
+  },
+  {
     "id": "mrbpzdb2vfn7okykpr",
     "name": "Entrecote",
     "mainIngredient": "Entrecote",
@@ -8,7 +25,7 @@
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur nÃ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
+    "instructions": "Kjernetemperatur nÃÂ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
     "images": [],
     "updatedAt": 1783493501727
   }
