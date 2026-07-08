@@ -567,7 +567,7 @@
 </div>
 
 <script>
-  // ── Constants ────────────────────────────────────────────────────────────
+  // ── Constants ────────────────────────────────────────────────
   const STORAGE_KEY    = 'oppskrifter_v1';
   const GH_OWNER_KEY   = 'gh_owner';
   const GH_REPO_KEY    = 'gh_repo';
@@ -575,7 +575,7 @@
   const GH_SHA_KEY     = 'gh_recipes_sha';
   const GH_FILE_PATH   = 'recipes.json';
 
-  // ── GitHub config helpers ────────────────────────────────────────────────
+  // ── GitHub config helpers ──────────────────────────────────────────
   function ghConfig() {
     return {
       owner: localStorage.getItem(GH_OWNER_KEY) || '',
@@ -589,7 +589,7 @@
     return !!(c.owner && c.repo && c.token);
   }
 
-  // ── Local storage helpers ────────────────────────────────────────────────
+  // ── Local storage helpers ──────────────────────────────────────────
   function loadRecipesLocal() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
@@ -599,7 +599,7 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  // ── GitHub API helpers ───────────────────────────────────────────────────
+  // ── GitHub API helpers ─────────────────────────────────────────────
   async function ghRequest(path, method, body) {
     const { owner, repo, token } = ghConfig();
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -628,7 +628,10 @@
   }
 
   async function ghPutRecipes(list) {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+    const json = JSON.stringify(list, null, 2);
+    const bytes = new TextEncoder().encode(json);
+    const binary = Array.from(bytes).map(b => String.fromCharCode(b)).join('');
+    const content = btoa(binary);
     const sha = localStorage.getItem(GH_SHA_KEY) || undefined;
     const body = {
       message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`,
@@ -641,7 +644,7 @@
     }
   }
 
-  // ── Sync status UI ───────────────────────────────────────────────────────
+  // ── Sync status UI ───────────────────────────────────────────────
   const syncDot   = document.getElementById('syncDot');
   const syncLabel = document.getElementById('syncLabel');
 
@@ -657,7 +660,7 @@
   let detailRecipeId  = null;
   let activeIngFilter = null;
 
-  // ── DOM refs ─────────────────────────────────────────────────────────────
+  // ── DOM refs ─────────────────────────────────────────────────────
   const recipeGrid      = document.getElementById('recipeGrid');
   const searchInput     = document.getElementById('searchInput');
   const filterBar       = document.getElementById('filterBar');
@@ -703,7 +706,7 @@
   const detailIngSec    = document.getElementById('detailIngSection');
   const detailInstSec   = document.getElementById('detailInstSection');
 
-  // ── Utility ──────────────────────────────────────────────────────────────
+  // ── Utility ────────────────────────────────────────────────────────
   function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
@@ -718,7 +721,7 @@
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ── Init: load from GitHub if configured ─────────────────────────────────
+  // ── Init: load from GitHub if configured ─────────────────────────────
   async function initLoad() {
     if (!ghConfigured()) {
       setSyncStatus('', 'Ikke koblet til GitHub');
@@ -734,7 +737,6 @@
       saveRecipesLocal(recipes);
       setSyncStatus('ok', 'Synkronisert');
     } catch (e) {
-      // File may not exist yet — that's fine
       if (e.message && e.message.includes('Not Found')) {
         setSyncStatus('ok', 'Klar (ingen fil ennå)');
       } else {
@@ -746,7 +748,7 @@
     renderGrid();
   }
 
-  // ── Persist: save locally + push to GitHub ────────────────────────────────
+  // ── Persist: save locally + push to GitHub ────────────────────────────
   async function persistRecipes(list) {
     saveRecipesLocal(list);
     if (!ghConfigured()) return;
@@ -761,7 +763,7 @@
     }
   }
 
-  // ── Render filter bar ─────────────────────────────────────────────────────
+  // ── Render filter bar ─────────────────────────────────────────────────
   function renderFilterBar() {
     const mains = [...new Set(recipes.map(r => r.mainIngredient).filter(Boolean))].sort();
     filterBar.innerHTML = '';
@@ -786,7 +788,7 @@
     });
   }
 
-  // ── Render grid ──────────────────────────────────────────────────────────
+  // ── Render grid ──────────────────────────────────────────────────────
   function renderGrid(filter = '') {
     const q = filter.toLowerCase();
     const filtered = recipes.filter(r => {
@@ -836,7 +838,7 @@
     });
   }
 
-  // ── Form helpers ─────────────────────────────────────────────────────────
+  // ── Form helpers ─────────────────────────────────────────────────────
   function addIngredientRow(value = '') {
     const row = document.createElement('div');
     row.className = 'ingredient-row';
@@ -861,7 +863,7 @@
     uploadHint.style.display = pendingImages.length ? 'none' : '';
   }
 
-  // ── Settings modal ────────────────────────────────────────────────────────
+  // ── Settings modal ────────────────────────────────────────────────
   function openSettings() {
     const c = ghConfig();
     ghOwnerInput.value = c.owner;
@@ -886,7 +888,6 @@
       return;
     }
 
-    // Test the connection
     settingsError.style.display = 'none';
     saveSettingsBtn.textContent = 'Tester…';
     saveSettingsBtn.disabled = true;
@@ -914,7 +915,6 @@
     saveSettingsBtn.disabled = false;
     closeSettings();
 
-    // Re-init: fetch recipes from GitHub
     await initLoad();
   }
 
@@ -928,7 +928,7 @@
     closeSettings();
   }
 
-  // ── Open / close form ────────────────────────────────────────────────────
+  // ── Open / close form ──────────────────────────────────────────────
   function openForm(id = null) {
     editingId = id;
     pendingImages = [];
@@ -968,7 +968,7 @@
     editingId = null;
   }
 
-  // ── Open / close detail ──────────────────────────────────────────────────
+  // ── Open / close detail ────────────────────────────────────────────
   function openDetail(id) {
     const r = recipes.find(x => x.id === id);
     if (!r) return;
@@ -1030,7 +1030,7 @@
     detailRecipeId = null;
   }
 
-  // ── Save ─────────────────────────────────────────────────────────────────
+  // ── Save ────────────────────────────────────────────────────────────────
   async function handleSave() {
     const name = fieldName.value.trim();
     if (!name) { fieldName.focus(); fieldName.style.borderColor = '#d33'; return; }
@@ -1080,7 +1080,7 @@
     renderGrid(searchInput.value);
   }
 
-  // ── File input ───────────────────────────────────────────────────────────
+  // ── File input ─────────────────────────────────────────────────────────
   fileInput.addEventListener('change', () => {
     const files = Array.from(fileInput.files);
     if (!files.length) return;
@@ -1098,7 +1098,7 @@
     fileInput.value = '';
   });
 
-  // ── Event listeners ──────────────────────────────────────────────────────
+  // ── Event listeners ────────────────────────────────────────────────
   settingsBtn.addEventListener('click', openSettings);
   closeSettingsBtn.addEventListener('click', closeSettings);
   cancelSettingsBtn.addEventListener('click', closeSettings);
@@ -1126,7 +1126,7 @@
   formModal.addEventListener('click', e => { if (e.target === formModal) closeForm(); });
   detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetail(); });
 
-  // ── Init ─────────────────────────────────────────────────────────────────
+  // ── Init ────────────────────────────────────────────────────────────────
   initLoad();
 
   // ── Service Worker ────────────────────────────────────────────────────────
