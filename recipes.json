@@ -1,16 +1,5 @@
 [
   {
-    "id": "mrc3b2l824espw2yznv",
-    "name": "test",
-    "mainIngredient": "",
-    "date": "",
-    "location": "",
-    "ingredients": [],
-    "instructions": "",
-    "images": [],
-    "updatedAt": 1783515882716
-  },
-  {
     "id": "mrbpzdb2vfn7okykpr",
     "name": "Entrecote",
     "mainIngredient": "Entrecote",
@@ -19,7 +8,7 @@
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur når ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
+    "instructions": "Kjernetemperatur nÃ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
     "images": [],
     "updatedAt": 1783493501727
   }
