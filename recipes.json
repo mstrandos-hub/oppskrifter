@@ -8,13 +8,13 @@
     "ingredients": [
       "Kyllingbryst",
       "Pasta",
-      "Løk og hvitløk",
-      "Fløte",
+      "LÃ¸k og hvitlÃ¸k",
+      "FlÃ¸te",
       "Kyllingkraft"
     ],
-    "instructions": "1.  Kok pastaen: Kok pasta i godt saltet vann etter anvisningen på pakken. Ta vare på litt pastavann før du heller av.\n2.  Stek kyllingen: Skjær kyllingbrystet i strimler eller terninger. Krydre med salt og pepper. Varm olje/smør i en stor stekepanne på middels-høy varme. Stek kyllingen til den er gyllen og gjennomstekt (ca. 5–7 minutter). Ta den ut av pannen og sett til side.\n3.  Lag sausen: I samme panne (bruk fettet fra kyllingen), stek løk og hvitløk til det er mykt og duftende (ca. 2–3 minutter). Hell i fløte og kyllingkraft. La det småkoke i 3–4 minutter til sausen tykner litt. Rør inn revet ost så den smelter. Smak til med salt, pepper og urter.\n4.  Sett sammen: Legg kyllingen tilbake i pannen. Vend inn den kokte pastaen (og litt pastavann hvis sausen er for tykk). La alt bli varmt sammen i 1–2 minutter.\n5.  Server: Fordel på tallerkener. Dryss over ekstra parmesan, frisk basilikum og gjerne litt sort pepper.",
+    "instructions": "1.  Kok pastaen: Kok pasta i godt saltet vann etter anvisningen pÃ¥ pakken. Ta vare pÃ¥ litt pastavann fÃ¸r du heller av.\n2.  Stek kyllingen: SkjÃ¦r kyllingbrystet i strimler eller terninger. Krydre med salt og pepper. Varm olje/smÃ¸r i en stor stekepanne pÃ¥ middels-hÃ¸y varme. Stek kyllingen til den er gyllen og gjennomstekt (ca. 5â7 minutter). Ta den ut av pannen og sett til side.\n3.  Lag sausen: I samme panne (bruk fettet fra kyllingen), stek lÃ¸k og hvitlÃ¸k til det er mykt og duftende (ca. 2â3 minutter). Hell i flÃ¸te og kyllingkraft. La det smÃ¥koke i 3â4 minutter til sausen tykner litt. RÃ¸r inn revet ost sÃ¥ den smelter. Smak til med salt, pepper og urter.\n4.  Sett sammen: Legg kyllingen tilbake i pannen. Vend inn den kokte pastaen (og litt pastavann hvis sausen er for tykk). La alt bli varmt sammen i 1â2 minutter.\n5.  Server: Fordel pÃ¥ tallerkener. Dryss over ekstra parmesan, frisk basilikum og gjerne litt sort pepper.",
     "images": [],
-    "updatedAt": 1783526235216
+    "updatedAt": 1783585967753
   },
   {
     "id": "mrbpzdb2vfn7okykpr",
@@ -25,7 +25,7 @@
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur nÃÂ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
+    "instructions": "Kjernetemperatur nÃÂÃÂ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
     "images": [],
     "updatedAt": 1783493501727
   }
