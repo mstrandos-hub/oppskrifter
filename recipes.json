@@ -8,11 +8,11 @@
     "ingredients": [
       "Kyllingbryst",
       "Pasta",
-      "LÃ¸k og hvitlÃ¸k",
-      "FlÃ¸te",
+      "LÃÂ¸k og hvitlÃÂ¸k",
+      "FlÃÂ¸te",
       "Kyllingkraft"
     ],
-    "instructions": "1.  Kok pastaen: Kok pasta i godt saltet vann etter anvisningen pÃ¥ pakken. Ta vare pÃ¥ litt pastavann fÃ¸r du heller av.\n2.  Stek kyllingen: SkjÃ¦r kyllingbrystet i strimler eller terninger. Krydre med salt og pepper. Varm olje/smÃ¸r i en stor stekepanne pÃ¥ middels-hÃ¸y varme. Stek kyllingen til den er gyllen og gjennomstekt (ca. 5â7 minutter). Ta den ut av pannen og sett til side.\n3.  Lag sausen: I samme panne (bruk fettet fra kyllingen), stek lÃ¸k og hvitlÃ¸k til det er mykt og duftende (ca. 2â3 minutter). Hell i flÃ¸te og kyllingkraft. La det smÃ¥koke i 3â4 minutter til sausen tykner litt. RÃ¸r inn revet ost sÃ¥ den smelter. Smak til med salt, pepper og urter.\n4.  Sett sammen: Legg kyllingen tilbake i pannen. Vend inn den kokte pastaen (og litt pastavann hvis sausen er for tykk). La alt bli varmt sammen i 1â2 minutter.\n5.  Server: Fordel pÃ¥ tallerkener. Dryss over ekstra parmesan, frisk basilikum og gjerne litt sort pepper.",
+    "instructions": "1.  Kok pastaen: Kok pasta i godt saltet vann etter anvisningen pÃÂ¥ pakken. Ta vare pÃÂ¥ litt pastavann fÃÂ¸r du heller av.\n2.  Stek kyllingen: SkjÃÂ¦r kyllingbrystet i strimler eller terninger. Krydre med salt og pepper. Varm olje/smÃÂ¸r i en stor stekepanne pÃÂ¥ middels-hÃÂ¸y varme. Stek kyllingen til den er gyllen og gjennomstekt (ca. 5Ã¢ÂÂ7 minutter). Ta den ut av pannen og sett til side.\n3.  Lag sausen: I samme panne (bruk fettet fra kyllingen), stek lÃÂ¸k og hvitlÃÂ¸k til det er mykt og duftende (ca. 2Ã¢ÂÂ3 minutter). Hell i flÃÂ¸te og kyllingkraft. La det smÃÂ¥koke i 3Ã¢ÂÂ4 minutter til sausen tykner litt. RÃÂ¸r inn revet ost sÃÂ¥ den smelter. Smak til med salt, pepper og urter.\n4.  Sett sammen: Legg kyllingen tilbake i pannen. Vend inn den kokte pastaen (og litt pastavann hvis sausen er for tykk). La alt bli varmt sammen i 1Ã¢ÂÂ2 minutter.\n5.  Server: Fordel pÃÂ¥ tallerkener. Dryss over ekstra parmesan, frisk basilikum og gjerne litt sort pepper.",
     "images": [],
     "updatedAt": 1783585967753
   },
@@ -20,13 +20,13 @@
     "id": "mrbpzdb2vfn7okykpr",
     "name": "Entrecote",
     "mainIngredient": "Entrecote",
-    "date": "2026-06-15",
-    "location": "Hjemme",
+    "date": "2026-07-09",
+    "location": "Hytta",
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur nÃÂÃÂ¥r ferdig er 58 grader. Husk at den stiger et par grader mens den hviler.",
+    "instructions": "Kjernetemperatur når ferdig er 58 grader. Men tåler også opp mot 62 grader grunnet all marmoreringen som var på denne. Husk at den stiger et par grader mens den hviler.",
     "images": [],
-    "updatedAt": 1783493501727
+    "updatedAt": 1783614975298
   }
 ]
