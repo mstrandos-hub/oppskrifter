@@ -1,4 +1,4 @@
-const CACHE = 'oppskrifter-v1';
+const CACHE = 'oppskrifter-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -24,7 +24,12 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Cache-first: serve from cache, fall back to network
+  // Always go to network for GitHub API calls — never serve stale API responses
+  if (e.request.url.startsWith('https://api.github.com/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  // Cache-first for app shell assets
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

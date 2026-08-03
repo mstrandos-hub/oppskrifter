@@ -429,6 +429,7 @@
     <span class="sync-status" id="syncStatus">
       <span class="sync-dot" id="syncDot"></span>
       <span id="syncLabel">Ikke koblet til</span>
+      <button id="retryBtn" title="Prøv igjen" style="display:none; margin-left:6px; padding:2px 8px; font-size:12px; border:1px solid #c0392b; border-radius:4px; background:#fff; color:#c0392b; cursor:pointer;">↺ Prøv igjen</button>
     </span>
     <button class="btn-settings" id="settingsBtn" title="GitHub-innstillinger">⚙</button>
     <button id="newRecipeBtn">+ Ny oppskrift</button>
@@ -567,7 +568,7 @@
 </div>
 
 <script>
-  // ── Constants ────────────────────────────────────────────────
+  // ── Constants ────────────────────────────────────────────────────────────
   const STORAGE_KEY    = 'oppskrifter_v1';
   const GH_OWNER_KEY   = 'gh_owner';
   const GH_REPO_KEY    = 'gh_repo';
@@ -575,7 +576,7 @@
   const GH_SHA_KEY     = 'gh_recipes_sha';
   const GH_FILE_PATH   = 'recipes.json';
 
-  // ── GitHub config helpers ──────────────────────────────────────────
+  // ── GitHub config helpers ────────────────────────────────────────────────
   function ghConfig() {
     return {
       owner: localStorage.getItem(GH_OWNER_KEY) || '',
@@ -589,7 +590,7 @@
     return !!(c.owner && c.repo && c.token);
   }
 
-  // ── Local storage helpers ──────────────────────────────────────────
+  // ── Local storage helpers ────────────────────────────────────────────────
   function loadRecipesLocal() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
@@ -599,8 +600,26 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  // ── GitHub API helpers ─────────────────────────────────────────────
-  async function ghRequest(path, method, body) {
+  // ── GitHub API helpers ───────────────────────────────────────────────────
+  const GH_TIMEOUT_MS  = 15000; // 15 s per attempt
+  const GH_MAX_RETRIES = 3;
+
+  // Retryable HTTP status codes (transient server / rate-limit errors)
+  function isRetryable(status) {
+    return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+  }
+
+  async function ghFetchWithTimeout(url, opts) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), GH_TIMEOUT_MS);
+    try {
+      return await fetch(url, { ...opts, signal: ctrl.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function ghRequest(path, method, body, _attempt = 0) {
     const { owner, repo, token } = ghConfig();
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
     const opts = {
@@ -612,11 +631,34 @@
       },
     };
     if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(url, opts);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `GitHub API ${res.status}`);
+
+    let res;
+    try {
+      res = await ghFetchWithTimeout(url, opts);
+    } catch (e) {
+      // Network error or timeout — retry with backoff
+      if (_attempt < GH_MAX_RETRIES - 1) {
+        await new Promise(r => setTimeout(r, 800 * Math.pow(2, _attempt)));
+        return ghRequest(path, method, body, _attempt + 1);
+      }
+      throw new Error(e.name === 'AbortError' ? 'Forespørselen tok for lang tid (timeout)' : `Nettverksfeil: ${e.message}`);
     }
+
+    if (!res.ok) {
+      // Retry transient server errors
+      if (isRetryable(res.status) && _attempt < GH_MAX_RETRIES - 1) {
+        const retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10);
+        const delay = retryAfter > 0 ? retryAfter * 1000 : 800 * Math.pow(2, _attempt);
+        await new Promise(r => setTimeout(r, delay));
+        return ghRequest(path, method, body, _attempt + 1);
+      }
+      const errBody = await res.json().catch(() => null);
+      const msg = errBody?.message || `GitHub API feil ${res.status}`;
+      const err = new Error(msg);
+      err.status = res.status;
+      throw err;
+    }
+
     return res.status === 204 ? null : res.json();
   }
 
@@ -632,25 +674,46 @@
     const bytes = new TextEncoder().encode(json);
     const binary = Array.from(bytes).map(b => String.fromCharCode(b)).join('');
     const content = btoa(binary);
+
+    async function attemptPut(sha) {
+      const body = {
+        message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`,
+        content,
+      };
+      if (sha) body.sha = sha;
+      const res = await ghRequest(GH_FILE_PATH, 'PUT', body);
+      if (res && res.content && res.content.sha) {
+        localStorage.setItem(GH_SHA_KEY, res.content.sha);
+      }
+    }
+
     const sha = localStorage.getItem(GH_SHA_KEY) || undefined;
-    const body = {
-      message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`,
-      content,
-    };
-    if (sha) body.sha = sha;
-    const res = await ghRequest(GH_FILE_PATH, 'PUT', body);
-    if (res && res.content && res.content.sha) {
-      localStorage.setItem(GH_SHA_KEY, res.content.sha);
+    try {
+      await attemptPut(sha);
+    } catch (e) {
+      // 409 Conflict means our cached SHA is stale — re-fetch and retry once
+      if (e.status === 409) {
+        const fresh = await ghGetRecipes();
+        // ghGetRecipes updates GH_SHA_KEY as a side-effect; use the new SHA
+        const newSha = localStorage.getItem(GH_SHA_KEY) || undefined;
+        // Merge: remote is authoritative for the file; overwrite with our list
+        void fresh; // remote data already applied to SHA cache
+        await attemptPut(newSha);
+      } else {
+        throw e;
+      }
     }
   }
 
-  // ── Sync status UI ───────────────────────────────────────────────
+  // ── Sync status UI ───────────────────────────────────────────────────────
   const syncDot   = document.getElementById('syncDot');
   const syncLabel = document.getElementById('syncLabel');
+  const retryBtn  = document.getElementById('retryBtn');
 
   function setSyncStatus(state, text) {
     syncDot.className = 'sync-dot' + (state ? ` ${state}` : '');
     syncLabel.textContent = text;
+    retryBtn.style.display = state === 'err' ? '' : 'none';
   }
 
   // ── State ────────────────────────────────────────────────────────────────
@@ -660,22 +723,22 @@
   let detailRecipeId  = null;
   let activeIngFilter = null;
 
-  // ── DOM refs ─────────────────────────────────────────────────────
+  // ── DOM refs ─────────────────────────────────────────────────────────────
   const recipeGrid      = document.getElementById('recipeGrid');
   const searchInput     = document.getElementById('searchInput');
   const filterBar       = document.getElementById('filterBar');
   const newRecipeBtn    = document.getElementById('newRecipeBtn');
   const settingsBtn     = document.getElementById('settingsBtn');
 
-  const settingsModal    = document.getElementById('settingsModal');
-  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-  const cancelSettingsBtn= document.getElementById('cancelSettingsBtn');
-  const saveSettingsBtn  = document.getElementById('saveSettingsBtn');
-  const clearGhBtn       = document.getElementById('clearGhBtn');
-  const ghOwnerInput     = document.getElementById('ghOwner');
-  const ghRepoInput      = document.getElementById('ghRepo');
-  const ghTokenInput     = document.getElementById('ghToken');
-  const settingsError    = document.getElementById('settingsError');
+  const settingsModal   = document.getElementById('settingsModal');
+  const closeSettingsBtn= document.getElementById('closeSettingsBtn');
+  const cancelSettingsBtn=document.getElementById('cancelSettingsBtn');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const clearGhBtn      = document.getElementById('clearGhBtn');
+  const ghOwnerInput    = document.getElementById('ghOwner');
+  const ghRepoInput     = document.getElementById('ghRepo');
+  const ghTokenInput    = document.getElementById('ghToken');
+  const settingsError   = document.getElementById('settingsError');
 
   const formModal       = document.getElementById('formModal');
   const formTitle       = document.getElementById('formTitle');
@@ -706,7 +769,7 @@
   const detailIngSec    = document.getElementById('detailIngSection');
   const detailInstSec   = document.getElementById('detailInstSection');
 
-  // ── Utility ────────────────────────────────────────────────────────
+  // ── Utility ──────────────────────────────────────────────────────────────
   function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
@@ -721,7 +784,7 @@
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ── Init: load from GitHub if configured ─────────────────────────────
+  // ── Init: load from GitHub if configured ─────────────────────────────────
   async function initLoad() {
     if (!ghConfigured()) {
       setSyncStatus('', 'Ikke koblet til GitHub');
@@ -737,6 +800,7 @@
       saveRecipesLocal(recipes);
       setSyncStatus('ok', 'Synkronisert');
     } catch (e) {
+      // File may not exist yet — that's fine
       if (e.message && e.message.includes('Not Found')) {
         setSyncStatus('ok', 'Klar (ingen fil ennå)');
       } else {
@@ -748,7 +812,7 @@
     renderGrid();
   }
 
-  // ── Persist: save locally + push to GitHub ────────────────────────────
+  // ── Persist: save locally + push to GitHub ────────────────────────────────
   async function persistRecipes(list) {
     saveRecipesLocal(list);
     if (!ghConfigured()) return;
@@ -763,7 +827,7 @@
     }
   }
 
-  // ── Render filter bar ─────────────────────────────────────────────────
+  // ── Render filter bar ─────────────────────────────────────────────────────
   function renderFilterBar() {
     const mains = [...new Set(recipes.map(r => r.mainIngredient).filter(Boolean))].sort();
     filterBar.innerHTML = '';
@@ -788,7 +852,7 @@
     });
   }
 
-  // ── Render grid ──────────────────────────────────────────────────────
+  // ── Render grid ──────────────────────────────────────────────────────────
   function renderGrid(filter = '') {
     const q = filter.toLowerCase();
     const filtered = recipes.filter(r => {
@@ -838,7 +902,7 @@
     });
   }
 
-  // ── Form helpers ─────────────────────────────────────────────────────
+  // ── Form helpers ─────────────────────────────────────────────────────────
   function addIngredientRow(value = '') {
     const row = document.createElement('div');
     row.className = 'ingredient-row';
@@ -863,7 +927,7 @@
     uploadHint.style.display = pendingImages.length ? 'none' : '';
   }
 
-  // ── Settings modal ────────────────────────────────────────────────
+  // ── Settings modal ────────────────────────────────────────────────────────
   function openSettings() {
     const c = ghConfig();
     ghOwnerInput.value = c.owner;
@@ -888,6 +952,7 @@
       return;
     }
 
+    // Test the connection
     settingsError.style.display = 'none';
     saveSettingsBtn.textContent = 'Tester…';
     saveSettingsBtn.disabled = true;
@@ -915,6 +980,7 @@
     saveSettingsBtn.disabled = false;
     closeSettings();
 
+    // Re-init: fetch recipes from GitHub
     await initLoad();
   }
 
@@ -928,7 +994,7 @@
     closeSettings();
   }
 
-  // ── Open / close form ──────────────────────────────────────────────
+  // ── Open / close form ────────────────────────────────────────────────────
   function openForm(id = null) {
     editingId = id;
     pendingImages = [];
@@ -968,7 +1034,7 @@
     editingId = null;
   }
 
-  // ── Open / close detail ────────────────────────────────────────────
+  // ── Open / close detail ──────────────────────────────────────────────────
   function openDetail(id) {
     const r = recipes.find(x => x.id === id);
     if (!r) return;
@@ -1030,7 +1096,7 @@
     detailRecipeId = null;
   }
 
-  // ── Save ────────────────────────────────────────────────────────────────
+  // ── Save ─────────────────────────────────────────────────────────────────
   async function handleSave() {
     const name = fieldName.value.trim();
     if (!name) { fieldName.focus(); fieldName.style.borderColor = '#d33'; return; }
@@ -1080,7 +1146,7 @@
     renderGrid(searchInput.value);
   }
 
-  // ── File input ─────────────────────────────────────────────────────────
+  // ── File input ───────────────────────────────────────────────────────────
   fileInput.addEventListener('change', () => {
     const files = Array.from(fileInput.files);
     if (!files.length) return;
@@ -1098,8 +1164,9 @@
     fileInput.value = '';
   });
 
-  // ── Event listeners ────────────────────────────────────────────────
+  // ── Event listeners ──────────────────────────────────────────────────────
   settingsBtn.addEventListener('click', openSettings);
+  retryBtn.addEventListener('click', () => initLoad());
   closeSettingsBtn.addEventListener('click', closeSettings);
   cancelSettingsBtn.addEventListener('click', closeSettings);
   saveSettingsBtn.addEventListener('click', handleSaveSettings);
@@ -1126,7 +1193,7 @@
   formModal.addEventListener('click', e => { if (e.target === formModal) closeForm(); });
   detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetail(); });
 
-  // ── Init ────────────────────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────────────────────────────────
   initLoad();
 
   // ── Service Worker ────────────────────────────────────────────────────────
