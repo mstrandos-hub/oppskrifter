@@ -804,7 +804,7 @@
       if (e.message && e.message.includes('Not Found')) {
         setSyncStatus('ok', 'Klar (ingen fil ennå)');
       } else {
-        setSyncStatus('err', 'Feil ved henting');
+        setSyncStatus('err', `Feil ved henting: ${e.message}`);
         console.error('GitHub load error:', e);
       }
     }
@@ -822,7 +822,7 @@
       await ghPutRecipes(list);
       setSyncStatus('ok', 'Lagret til GitHub ✓');
     } catch (e) {
-      setSyncStatus('err', 'Feil ved lagring til GitHub');
+      setSyncStatus('err', `Lagringsfeil: ${e.message}`);
       console.error('GitHub save error:', e);
     }
   }
@@ -959,10 +959,19 @@
 
     try {
       const testUrl = `https://api.github.com/repos/${owner}/${repo}`;
-      const res = await fetch(testUrl, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-      });
-      if (!res.ok) throw new Error(`Fant ikke repoet (${res.status}). Sjekk brukernavn, repo og token.`);
+      let res;
+      try {
+        res = await fetch(testUrl, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+        });
+      } catch (networkErr) {
+        throw new Error(`Nettverksfeil: ${networkErr.message}. Sjekk internettforbindelsen.`);
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        const detail = body?.message ? ` — ${body.message}` : '';
+        throw new Error(`GitHub svarte med ${res.status}${detail}. Sjekk brukernavn, repo-navn og token-tilgang (Contents: read & write).`);
+      }
     } catch (e) {
       settingsError.textContent = e.message;
       settingsError.style.display = '';
