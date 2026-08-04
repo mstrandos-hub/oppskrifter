@@ -25,6 +25,7 @@
       min-height: 100vh;
     }
 
+    /* ── Header ── */
     header {
       background: #fff;
       border-bottom: 1px solid #e5e7eb;
@@ -60,6 +61,8 @@
       line-height: 1;
     }
     .btn-settings:hover { background: #f7f8fa !important; color: #1f2328 !important; }
+
+    /* ── Sync status ── */
     .sync-status {
       font-size: 12px;
       color: #57606a;
@@ -77,117 +80,276 @@
     .sync-dot.ok   { background: #2da44e; }
     .sync-dot.err  { background: #c0392b; }
     .sync-dot.busy { background: #e6a817; }
+
+    /* ── Layout ── */
     .container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
-    .search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+
+    /* ── Search ── */
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
     .search-bar input {
-      flex: 1; padding: 9px 13px; border: 1px solid #e5e7eb;
-      border-radius: 6px; font-size: 14px; background: #fff; color: #1f2328;
+      flex: 1;
+      padding: 9px 13px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #fff;
+      color: #1f2328;
     }
     .search-bar input:focus { outline: none; border-color: #3b82d4; }
-    .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; min-height: 28px; }
+
+    /* ── Main ingredient filter bar ── */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+      min-height: 28px;
+    }
     .filter-tag {
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 20px;
-      padding: 3px 13px; font-size: 12px; cursor: pointer; color: #57606a; white-space: nowrap;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 3px 13px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #57606a;
+      white-space: nowrap;
     }
     .filter-tag:hover { border-color: #3b82d4; color: #3b82d4; }
     .filter-tag.active { background: #3b82d4; border-color: #3b82d4; color: #fff; }
-    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+    /* ── Recipe grid ── */
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
     .recipe-card {
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
-      overflow: hidden; cursor: pointer; transition: border-color 0.15s;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s;
     }
     .recipe-card:hover { border-color: #3b82d4; }
-    .recipe-card .card-img {
-      width: 100%; height: 170px; object-fit: cover; background: #f0f1f3;
-      display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 13px;
-    }
-    .recipe-card .card-img img { width: 100%; height: 100%; object-fit: cover; }
+
     .recipe-card .card-body { padding: 14px; }
     .recipe-card .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
     .recipe-card .card-meta { font-size: 12px; color: #57606a; line-height: 1.7; }
     .recipe-card .card-badge {
-      display: inline-block; background: #eff6ff; color: #3b82d4;
-      border-radius: 10px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin-bottom: 4px;
+      display: inline-block;
+      background: #eff6ff;
+      color: #3b82d4;
+      border-radius: 10px;
+      padding: 1px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
-    .empty-state { text-align: center; color: #57606a; padding: 64px 0; grid-column: 1 / -1; }
+
+    .empty-state {
+      text-align: center;
+      color: #57606a;
+      padding: 64px 0;
+      grid-column: 1 / -1;
+    }
     .empty-state p { margin-top: 8px; font-size: 14px; }
+
+    /* ── Modal overlay ── */
     .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-      z-index: 100; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
     }
     .modal-overlay.open { display: flex; }
-    .modal { background: #fff; border-radius: 12px; width: 100%; max-width: 640px; padding: 28px 28px 24px; position: relative; }
-    .modal-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; }
+
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 640px;
+      padding: 28px 28px 24px;
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
     .modal .close-btn {
-      position: absolute; top: 16px; right: 18px; background: none; border: none;
-      font-size: 20px; cursor: pointer; color: #57606a; line-height: 1;
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #57606a;
+      line-height: 1;
     }
     .modal .close-btn:hover { color: #1f2328; }
+
+    /* ── Form ── */
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1f2328; }
-    .form-group input, .form-group textarea {
-      width: 100%; padding: 9px 12px; border: 1px solid #e5e7eb; border-radius: 6px;
-      font-size: 14px; font-family: inherit; color: #1f2328; background: #fff; resize: vertical;
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #1f2328;
     }
-    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #3b82d4; }
-    .form-hint { font-size: 12px; color: #57606a; margin-top: 4px; }
-    .img-upload-area {
-      border: 2px dashed #e5e7eb; border-radius: 8px; padding: 24px; text-align: center;
-      cursor: pointer; color: #57606a; font-size: 13px; position: relative; transition: border-color 0.15s;
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1f2328;
+      background: #fff;
+      resize: vertical;
     }
-    .img-upload-area:hover { border-color: #3b82d4; }
-    .img-upload-area input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; padding: 0;
+    .form-group input:focus,
+    .form-group textarea:focus { outline: none; border-color: #3b82d4; }
+
+    .form-hint {
+      font-size: 12px;
+      color: #57606a;
+      margin-top: 4px;
     }
-    .img-upload-area .upload-preview { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
-    .img-upload-area .upload-preview img { height: 72px; width: 72px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb; }
+
+    /* ── Ingredient list ── */
     .ingredient-list { display: flex; flex-direction: column; gap: 6px; }
-    .ingredient-row { display: flex; gap: 6px; }
+    .ingredient-row {
+      display: flex;
+      gap: 6px;
+    }
     .ingredient-row input { flex: 1; }
     .ingredient-row .remove-ing {
-      background: none; border: 1px solid #e5e7eb; border-radius: 6px;
-      padding: 0 10px; font-size: 16px; cursor: pointer; color: #57606a; line-height: 1;
+      background: none;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #57606a;
+      line-height: 1;
     }
     .ingredient-row .remove-ing:hover { border-color: #d33; color: #d33; }
+
     .add-ing-btn {
-      margin-top: 6px; background: none; border: 1px dashed #3b82d4; color: #3b82d4;
-      border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+      margin-top: 6px;
+      background: none;
+      border: 1px dashed #3b82d4;
+      color: #3b82d4;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
     }
     .add-ing-btn:hover { background: #eff6ff; }
-    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+    /* ── Form actions ── */
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
     .btn-secondary {
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
-      padding: 8px 18px; font-size: 14px; cursor: pointer; color: #1f2328;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #1f2328;
     }
     .btn-secondary:hover { background: #f7f8fa; }
     .btn-primary {
-      background: #3b82d4; color: #fff; border: none; border-radius: 6px;
-      padding: 8px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+      background: #3b82d4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
     .btn-primary:hover { background: #2f6bbf; }
     .btn-danger {
-      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
-      padding: 8px 18px; font-size: 14px; cursor: pointer; color: #c0392b;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #c0392b;
     }
     .btn-danger:hover { background: #fdf2f2; border-color: #d33; }
-    .detail-meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 18px; font-size: 13px; color: #57606a; }
-    .detail-meta-row span { display: flex; align-items: center; gap: 4px; }
-    .detail-gallery { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .detail-gallery img {
-      height: 200px; flex: 1; min-width: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb;
+
+    /* ── Detail view ── */
+    .detail-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      color: #57606a;
     }
+    .detail-meta-row span { display: flex; align-items: center; gap: 4px; }
+
     .detail-section { margin-bottom: 20px; }
     .detail-section h3 {
-      font-size: 14px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; color: #57606a; margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #57606a;
+      margin-bottom: 10px;
     }
-    .detail-section ul { list-style: disc; padding-left: 20px; font-size: 14px; line-height: 1.8; }
-    .detail-section p { font-size: 14px; white-space: pre-wrap; line-height: 1.7; }
+    .detail-section ul {
+      list-style: disc;
+      padding-left: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .detail-section p {
+      font-size: 14px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+
+    /* ── Settings notice box ── */
     .notice {
-      background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
-      padding: 12px 14px; font-size: 13px; color: #92400e; margin-bottom: 16px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 16px;
     }
-    .notice.info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    .notice.info {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1e40af;
+    }
   </style>
 </head>
 <body>
@@ -213,22 +375,27 @@
   <div class="recipe-grid" id="recipeGrid"></div>
 </div>
 
+<!-- ═══ SETTINGS MODAL ═══ -->
 <div class="modal-overlay" id="settingsModal">
   <div class="modal" style="max-width:500px;">
     <button class="close-btn" id="closeSettingsBtn">✕</button>
     <div class="modal-title">GitHub-innstillinger</div>
+
     <div class="notice info">
       Oppskriftene lagres som <strong>recipes.json</strong> i GitHub-repositoriet ditt.
       Du trenger et Personal Access Token med <strong>repo</strong>-tilgang.
     </div>
+
     <div class="form-group">
       <label for="ghOwner">GitHub-bruker eller organisasjon</label>
       <input type="text" id="ghOwner" placeholder="F.eks. mstrandos-hub" />
     </div>
+
     <div class="form-group">
       <label for="ghRepo">Repository-navn</label>
       <input type="text" id="ghRepo" placeholder="F.eks. oppskrifter" />
     </div>
+
     <div class="form-group">
       <label for="ghToken">Personal Access Token</label>
       <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
@@ -238,7 +405,9 @@
         Token lagres kun lokalt i nettleseren din.
       </div>
     </div>
+
     <div id="settingsError" style="color:#c0392b; font-size:13px; margin-bottom:8px; display:none;"></div>
+
     <div class="form-actions">
       <button class="btn-danger" id="clearGhBtn">Fjern tilkobling</button>
       <button class="btn-secondary" id="cancelSettingsBtn">Avbryt</button>
@@ -247,18 +416,22 @@
   </div>
 </div>
 
+<!-- ═══ FORM MODAL ═══ -->
 <div class="modal-overlay" id="formModal">
   <div class="modal">
     <button class="close-btn" id="closeFormBtn">✕</button>
     <div class="modal-title" id="formTitle">Ny oppskrift</div>
+
     <div class="form-group">
       <label for="fieldName">Rettens navn *</label>
       <input type="text" id="fieldName" placeholder="F.eks. Kjøttkaker i brun saus" />
     </div>
+
     <div class="form-group">
       <label for="fieldMainIng">Hovedingrediens</label>
       <input type="text" id="fieldMainIng" placeholder="F.eks. Laks, Kylling, Pasta…" />
     </div>
+
     <div class="form-group" style="display:flex; gap:12px;">
       <div style="flex:1;">
         <label for="fieldDate">Dato lagd</label>
@@ -269,23 +442,18 @@
         <input type="text" id="fieldLocation" placeholder="F.eks. Hjemme, Hytta…" />
       </div>
     </div>
+
     <div class="form-group">
       <label>Ingredienser</label>
       <div class="ingredient-list" id="ingredientList"></div>
       <button class="add-ing-btn" id="addIngBtn">+ Legg til ingrediens</button>
     </div>
+
     <div class="form-group">
       <label for="fieldInstructions">Instruksjoner</label>
       <textarea id="fieldInstructions" rows="7" placeholder="Fremgangsmåte…"></textarea>
     </div>
-    <div class="form-group">
-      <label>Bilder</label>
-      <div class="img-upload-area" id="uploadArea">
-        <input type="file" id="fileInput" accept="image/*" multiple />
-        <div id="uploadHint">Klikk eller dra bilder hit</div>
-        <div class="upload-preview" id="uploadPreview"></div>
-      </div>
-    </div>
+
     <div class="form-actions">
       <button class="btn-danger" id="deleteBtn" style="display:none;">Slett</button>
       <button class="btn-secondary" id="cancelBtn">Avbryt</button>
@@ -294,20 +462,24 @@
   </div>
 </div>
 
+<!-- ═══ DETAIL MODAL ═══ -->
 <div class="modal-overlay" id="detailModal">
   <div class="modal">
     <button class="close-btn" id="closeDetailBtn">✕</button>
     <div class="modal-title" id="detailTitle"></div>
+
     <div class="detail-meta-row" id="detailMeta"></div>
-    <div class="detail-gallery" id="detailGallery"></div>
+
     <div class="detail-section" id="detailIngSection">
       <h3>Ingredienser</h3>
       <ul id="detailIngList"></ul>
     </div>
+
     <div class="detail-section" id="detailInstSection">
       <h3>Instruksjoner</h3>
       <p id="detailInstructions"></p>
     </div>
+
     <div class="form-actions">
       <button class="btn-secondary" id="editFromDetailBtn">Rediger</button>
       <button class="btn-secondary" id="closeDetailActionBtn">Lukk</button>
@@ -316,6 +488,7 @@
 </div>
 
 <script>
+  // ── Constants ────────────────────────────────────────────────────────────
   const STORAGE_KEY    = 'oppskrifter_v1';
   const GH_OWNER_KEY   = 'gh_owner';
   const GH_REPO_KEY    = 'gh_repo';
@@ -323,6 +496,7 @@
   const GH_SHA_KEY     = 'gh_recipes_sha';
   const GH_FILE_PATH   = 'recipes.json';
 
+  // ── GitHub config helpers ────────────────────────────────────────────────
   function ghConfig() {
     return {
       owner: localStorage.getItem(GH_OWNER_KEY) || '',
@@ -336,6 +510,7 @@
     return !!(c.owner && c.repo && c.token);
   }
 
+  // ── Local storage helpers ────────────────────────────────────────────────
   function loadRecipesLocal() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch { return []; }
@@ -345,10 +520,11 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  // ── GitHub API ───────────────────────────────────────────────────────────
-  const GH_TIMEOUT_MS  = 15000;
+  // ── GitHub API helpers ───────────────────────────────────────────────────
+  const GH_TIMEOUT_MS  = 15000; // 15 s per attempt
   const GH_MAX_RETRIES = 3;
 
+  // Retryable HTTP status codes (transient server / rate-limit errors)
   function isRetryable(status) {
     return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
   }
@@ -380,6 +556,7 @@
     try {
       res = await ghFetchWithTimeout(url, opts);
     } catch (e) {
+      // Network error or timeout — retry with backoff
       if (_attempt < GH_MAX_RETRIES - 1) {
         await new Promise(r => setTimeout(r, 800 * Math.pow(2, _attempt)));
         return ghRequest(path, method, body, _attempt + 1);
@@ -388,6 +565,7 @@
     }
 
     if (!res.ok) {
+      // Retry transient server errors
       if (isRetryable(res.status) && _attempt < GH_MAX_RETRIES - 1) {
         const retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10);
         const delay = retryAfter > 0 ? retryAfter * 1000 : 800 * Math.pow(2, _attempt);
@@ -404,52 +582,6 @@
     return res.status === 204 ? null : res.json();
   }
 
-  // ── Image helpers ────────────────────────────────────────────────────────
-  // Images stored as separate files: images/{recipeId}-{n}.b64 (plain data URI text)
-  // recipes.json images[] holds path strings like "images/id-0.b64"
-
-  function isImagePath(v) { return typeof v === 'string' && v.startsWith('images/'); }
-  function isDataUri(v)   { return typeof v === 'string' && v.startsWith('data:'); }
-
-  function rawImageUrl(path) {
-    const { owner, repo } = ghConfig();
-    return `https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`;
-  }
-
-  async function ghFetchImage(path) {
-    const cached = sessionStorage.getItem('img:' + path);
-    if (cached) return cached;
-    const res = await fetch(rawImageUrl(path));
-    if (!res.ok) throw new Error(`Bilde ikke funnet: ${path}`);
-    const text = await res.text();
-    sessionStorage.setItem('img:' + path, text);
-    return text;
-  }
-
-  async function ghPutImage(recipeId, index, dataUri) {
-    const path = `images/${recipeId}-${index}.b64`;
-    const body = { message: `Bilde for oppskrift ${recipeId}`, content: btoa(unescape(encodeURIComponent(dataUri))) };
-    try {
-      const existing = await ghRequest(path, 'GET');
-      body.sha = existing.sha;
-    } catch (e) {
-      if (e.status !== 404) throw e;
-    }
-    await ghRequest(path, 'PUT', body);
-    sessionStorage.setItem('img:' + path, dataUri);
-    return path;
-  }
-
-  async function ghDeleteImage(path) {
-    try {
-      const existing = await ghRequest(path, 'GET');
-      await ghRequest(path, 'DELETE', { message: `Slettet bilde ${path}`, sha: existing.sha });
-    } catch (e) {
-      if (e.status !== 404) console.warn('Kunne ikke slette bilde:', path, e);
-    }
-    sessionStorage.removeItem('img:' + path);
-  }
-
   async function ghGetRecipes() {
     const data = await ghRequest(GH_FILE_PATH, 'GET');
     localStorage.setItem(GH_SHA_KEY, data.sha);
@@ -457,48 +589,23 @@
     return JSON.parse(json);
   }
 
-  async function ghResolveImages(list) {
-    await Promise.all(list.map(async r => {
-      r.images = await Promise.all((r.images || []).map(async img => {
-        if (isImagePath(img)) {
-          try { return await ghFetchImage(img); } catch { return img; }
-        }
-        return img;
-      }));
-    }));
-  }
-
-  async function ghPutRecipes(list, oldList) {
-    const toDelete = [];
-    const uploadedList = await Promise.all(list.map(async r => {
-      const resolved = await Promise.all((r.images || []).map(async (img, n) => {
-        if (isDataUri(img)) return ghPutImage(r.id, n, img);
-        return img;
-      }));
-      return { ...r, images: resolved };
-    }));
-
-    if (oldList) {
-      for (const old of oldList) {
-        const current = uploadedList.find(r => r.id === old.id);
-        for (const img of (old.images || [])) {
-          if (isImagePath(img) && (!current || !(current.images || []).includes(img))) {
-            toDelete.push(img);
-          }
-        }
-      }
-    }
-
-    const json = JSON.stringify(uploadedList, null, 2);
+  async function ghPutRecipes(list) {
+    // Write recipes.json
+    const json = JSON.stringify(list, null, 2);
     const bytes = new TextEncoder().encode(json);
     const binary = Array.from(bytes).map(b => String.fromCharCode(b)).join('');
     const content = btoa(binary);
 
     async function attemptPut(sha) {
-      const body = { message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`, content };
+      const body = {
+        message: `Oppdaterte oppskrifter (${new Date().toLocaleString('no')})`,
+        content,
+      };
       if (sha) body.sha = sha;
       const res = await ghRequest(GH_FILE_PATH, 'PUT', body);
-      if (res && res.content && res.content.sha) localStorage.setItem(GH_SHA_KEY, res.content.sha);
+      if (res && res.content && res.content.sha) {
+        localStorage.setItem(GH_SHA_KEY, res.content.sha);
+      }
     }
 
     const sha = localStorage.getItem(GH_SHA_KEY) || undefined;
@@ -506,18 +613,15 @@
       await attemptPut(sha);
     } catch (e) {
       if (e.status === 409) {
-        await ghGetRecipes();
+        await ghGetRecipes(); // refreshes GH_SHA_KEY
         await attemptPut(localStorage.getItem(GH_SHA_KEY) || undefined);
       } else {
         throw e;
       }
     }
-
-    await Promise.all(toDelete.map(ghDeleteImage));
-    return uploadedList;
   }
 
-  // ── Sync status ──────────────────────────────────────────────────────────
+  // ── Sync status UI ───────────────────────────────────────────────────────
   const syncDot   = document.getElementById('syncDot');
   const syncLabel = document.getElementById('syncLabel');
   const retryBtn  = document.getElementById('retryBtn');
@@ -528,17 +632,19 @@
     retryBtn.style.display = state === 'err' ? '' : 'none';
   }
 
+  // ── State ────────────────────────────────────────────────────────────────
   let recipes         = loadRecipesLocal();
   let editingId       = null;
-  let pendingImages   = [];
   let detailRecipeId  = null;
   let activeIngFilter = null;
 
+  // ── DOM refs ─────────────────────────────────────────────────────────────
   const recipeGrid      = document.getElementById('recipeGrid');
   const searchInput     = document.getElementById('searchInput');
   const filterBar       = document.getElementById('filterBar');
   const newRecipeBtn    = document.getElementById('newRecipeBtn');
   const settingsBtn     = document.getElementById('settingsBtn');
+
   const settingsModal   = document.getElementById('settingsModal');
   const closeSettingsBtn= document.getElementById('closeSettingsBtn');
   const cancelSettingsBtn=document.getElementById('cancelSettingsBtn');
@@ -548,6 +654,7 @@
   const ghRepoInput     = document.getElementById('ghRepo');
   const ghTokenInput    = document.getElementById('ghToken');
   const settingsError   = document.getElementById('settingsError');
+
   const formModal       = document.getElementById('formModal');
   const formTitle       = document.getElementById('formTitle');
   const closeFormBtn    = document.getElementById('closeFormBtn');
@@ -561,31 +668,34 @@
   const fieldInstr      = document.getElementById('fieldInstructions');
   const ingredientList  = document.getElementById('ingredientList');
   const addIngBtn       = document.getElementById('addIngBtn');
-  const fileInput       = document.getElementById('fileInput');
-  const uploadPreview   = document.getElementById('uploadPreview');
-  const uploadHint      = document.getElementById('uploadHint');
+
   const detailModal     = document.getElementById('detailModal');
   const closeDetailBtn  = document.getElementById('closeDetailBtn');
   const closeDetailAct  = document.getElementById('closeDetailActionBtn');
   const editFromDetail  = document.getElementById('editFromDetailBtn');
   const detailTitle     = document.getElementById('detailTitle');
   const detailMeta      = document.getElementById('detailMeta');
-  const detailGallery   = document.getElementById('detailGallery');
   const detailIngList   = document.getElementById('detailIngList');
   const detailInstr     = document.getElementById('detailInstructions');
   const detailIngSec    = document.getElementById('detailIngSection');
   const detailInstSec   = document.getElementById('detailInstSection');
 
-  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+  // ── Utility ──────────────────────────────────────────────────────────────
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
   function formatDate(iso) {
     if (!iso) return '';
     const [y, m, d] = iso.split('-');
     return `${d}.${m}.${y}`;
   }
+
   function escHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ── Init: load from GitHub if configured ─────────────────────────────────
   async function initLoad() {
     if (!ghConfigured()) {
       setSyncStatus('', 'Ikke koblet til GitHub');
@@ -593,15 +703,15 @@
       renderGrid();
       return;
     }
+
     setSyncStatus('busy', 'Henter oppskrifter…');
     try {
       const ghRecipes = await ghGetRecipes();
-      setSyncStatus('busy', 'Laster bilder…');
-      await ghResolveImages(ghRecipes);
       recipes = ghRecipes;
       saveRecipesLocal(recipes);
       setSyncStatus('ok', 'Synkronisert');
     } catch (e) {
+      // File may not exist yet — that's fine
       if (e.message && (e.message.includes('Not Found') || e.status === 404)) {
         setSyncStatus('ok', 'Klar (ingen fil ennå)');
       } else {
@@ -613,16 +723,14 @@
     renderGrid();
   }
 
+  // ── Persist: save locally + push to GitHub ────────────────────────────────
   async function persistRecipes(list) {
     saveRecipesLocal(list);
     if (!ghConfigured()) return;
-    const oldList = recipes;
+
     setSyncStatus('busy', 'Lagrer til GitHub…');
     try {
-      const saved = await ghPutRecipes(list, oldList);
-      recipes = saved;
-      await ghResolveImages(recipes);
-      saveRecipesLocal(recipes);
+      await ghPutRecipes(list);
       setSyncStatus('ok', 'Lagret til GitHub ✓');
     } catch (e) {
       setSyncStatus('err', `Lagringsfeil: ${e.message}`);
@@ -630,15 +738,18 @@
     }
   }
 
+  // ── Render filter bar ─────────────────────────────────────────────────────
   function renderFilterBar() {
     const mains = [...new Set(recipes.map(r => r.mainIngredient).filter(Boolean))].sort();
     filterBar.innerHTML = '';
     if (!mains.length) return;
+
     const allTag = document.createElement('button');
     allTag.className = 'filter-tag' + (activeIngFilter === null ? ' active' : '');
     allTag.textContent = 'Alle';
     allTag.addEventListener('click', () => { activeIngFilter = null; renderFilterBar(); renderGrid(searchInput.value); });
     filterBar.appendChild(allTag);
+
     mains.forEach(ing => {
       const tag = document.createElement('button');
       tag.className = 'filter-tag' + (activeIngFilter === ing ? ' active' : '');
@@ -652,6 +763,7 @@
     });
   }
 
+  // ── Render grid ──────────────────────────────────────────────────────────
   function renderGrid(filter = '') {
     const q = filter.toLowerCase();
     const filtered = recipes.filter(r => {
@@ -659,7 +771,9 @@
       const matchIng  = activeIngFilter === null || (r.mainIngredient || '').toLowerCase() === activeIngFilter.toLowerCase();
       return matchText && matchIng;
     });
+
     recipeGrid.innerHTML = '';
+
     const noResults = filter || activeIngFilter;
     if (filtered.length === 0) {
       recipeGrid.innerHTML = `
@@ -669,31 +783,32 @@
         </div>`;
       return;
     }
+
     filtered.forEach(recipe => {
       const card = document.createElement('div');
       card.className = 'recipe-card';
       card.dataset.id = recipe.id;
-      const imgHTML = recipe.images && recipe.images.length
-        ? `<div class="card-img"><img src="${recipe.images[0]}" alt="${recipe.name}" /></div>`
-        : `<div class="card-img">Ingen bilde</div>`;
+
       const ingCount = recipe.ingredients ? recipe.ingredients.filter(i => i.trim()).length : 0;
       const badgeHTML = recipe.mainIngredient ? `<div class="card-badge">${escHtml(recipe.mainIngredient)}</div>` : '';
       const metaParts = [];
       if (recipe.date) metaParts.push(formatDate(recipe.date));
       if (recipe.location) metaParts.push(escHtml(recipe.location));
       metaParts.push(`${ingCount} ingrediens${ingCount !== 1 ? 'er' : ''}`);
+
       card.innerHTML = `
-        ${imgHTML}
         <div class="card-body">
           ${badgeHTML}
           <div class="card-title">${escHtml(recipe.name)}</div>
           <div class="card-meta">${metaParts.join(' · ')}</div>
         </div>`;
+
       card.addEventListener('click', () => openDetail(recipe.id));
       recipeGrid.appendChild(card);
     });
   }
 
+  // ── Form helpers ─────────────────────────────────────────────────────────
   function addIngredientRow(value = '') {
     const row = document.createElement('div');
     row.className = 'ingredient-row';
@@ -708,16 +823,7 @@
     return Array.from(ingredientList.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
   }
 
-  function refreshUploadPreview() {
-    uploadPreview.innerHTML = '';
-    pendingImages.forEach(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      uploadPreview.appendChild(img);
-    });
-    uploadHint.style.display = pendingImages.length ? 'none' : '';
-  }
-
+  // ── Settings modal ────────────────────────────────────────────────────────
   function openSettings() {
     const c = ghConfig();
     ghOwnerInput.value = c.owner;
@@ -727,25 +833,33 @@
     settingsModal.classList.add('open');
   }
 
-  function closeSettings() { settingsModal.classList.remove('open'); }
+  function closeSettings() {
+    settingsModal.classList.remove('open');
+  }
 
   async function handleSaveSettings() {
     const owner = ghOwnerInput.value.trim();
     const repo  = ghRepoInput.value.trim();
     const token = ghTokenInput.value.trim();
+
     if (!owner || !repo || !token) {
       settingsError.textContent = 'Fyll ut alle feltene.';
       settingsError.style.display = '';
       return;
     }
+
+    // Test the connection
     settingsError.style.display = 'none';
     saveSettingsBtn.textContent = 'Tester…';
     saveSettingsBtn.disabled = true;
+
     try {
       const testUrl = `https://api.github.com/repos/${owner}/${repo}`;
       let res;
       try {
-        res = await fetch(testUrl, { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' } });
+        res = await fetch(testUrl, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+        });
       } catch (networkErr) {
         throw new Error(`Nettverksfeil: ${networkErr.message}. Sjekk internettforbindelsen.`);
       }
@@ -761,13 +875,17 @@
       saveSettingsBtn.disabled = false;
       return;
     }
+
     localStorage.setItem(GH_OWNER_KEY, owner);
     localStorage.setItem(GH_REPO_KEY,  repo);
     localStorage.setItem(GH_TOKEN_KEY, token);
     localStorage.removeItem(GH_SHA_KEY);
+
     saveSettingsBtn.textContent = 'Lagre og koble til';
     saveSettingsBtn.disabled = false;
     closeSettings();
+
+    // Re-init: fetch recipes from GitHub
     await initLoad();
   }
 
@@ -781,17 +899,16 @@
     closeSettings();
   }
 
+  // ── Open / close form ────────────────────────────────────────────────────
   function openForm(id = null) {
     editingId = id;
-    pendingImages = [];
     ingredientList.innerHTML = '';
     fieldName.value = '';
     fieldMainIng.value = '';
     fieldDate.value = '';
     fieldLocation.value = '';
     fieldInstr.value = '';
-    fileInput.value = '';
-    refreshUploadPreview();
+
     if (id) {
       const r = recipes.find(x => x.id === id);
       formTitle.textContent = 'Rediger oppskrift';
@@ -802,24 +919,29 @@
       fieldLocation.value = r.location || '';
       fieldInstr.value = r.instructions || '';
       (r.ingredients || []).forEach(i => addIngredientRow(i));
-      pendingImages = r.images ? [...r.images] : [];
-      refreshUploadPreview();
     } else {
       formTitle.textContent = 'Ny oppskrift';
       deleteBtn.style.display = 'none';
       addIngredientRow();
     }
+
     formModal.classList.add('open');
     fieldName.focus();
   }
 
-  function closeForm() { formModal.classList.remove('open'); editingId = null; }
+  function closeForm() {
+    formModal.classList.remove('open');
+    editingId = null;
+  }
 
+  // ── Open / close detail ──────────────────────────────────────────────────
   function openDetail(id) {
     const r = recipes.find(x => x.id === id);
     if (!r) return;
     detailRecipeId = id;
+
     detailTitle.textContent = r.name;
+
     detailMeta.innerHTML = '';
     if (r.mainIngredient) {
       const s = document.createElement('span');
@@ -837,18 +959,7 @@
       detailMeta.appendChild(s);
     }
     detailMeta.style.display = detailMeta.children.length ? '' : 'none';
-    detailGallery.innerHTML = '';
-    if (r.images && r.images.length) {
-      r.images.forEach(src => {
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = r.name;
-        detailGallery.appendChild(img);
-      });
-      detailGallery.style.display = '';
-    } else {
-      detailGallery.style.display = 'none';
-    }
+
     const ings = (r.ingredients || []).filter(Boolean);
     if (ings.length) {
       detailIngList.innerHTML = ings.map(i => `<li>${escHtml(i)}</li>`).join('');
@@ -856,23 +967,31 @@
     } else {
       detailIngSec.style.display = 'none';
     }
+
     if (r.instructions && r.instructions.trim()) {
       detailInstr.textContent = r.instructions;
       detailInstSec.style.display = '';
     } else {
       detailInstSec.style.display = 'none';
     }
+
     detailModal.classList.add('open');
   }
 
-  function closeDetail() { detailModal.classList.remove('open'); detailRecipeId = null; }
+  function closeDetail() {
+    detailModal.classList.remove('open');
+    detailRecipeId = null;
+  }
 
+  // ── Save ─────────────────────────────────────────────────────────────────
   async function handleSave() {
     const name = fieldName.value.trim();
     if (!name) { fieldName.focus(); fieldName.style.borderColor = '#d33'; return; }
     fieldName.style.borderColor = '';
+
     saveBtn.disabled = true;
     saveBtn.textContent = 'Lagrer…';
+
     const recipe = {
       id: editingId || uid(),
       name,
@@ -881,23 +1000,27 @@
       location: fieldLocation.value.trim(),
       ingredients: getIngredients(),
       instructions: fieldInstr.value.trim(),
-      images: [...pendingImages],
       updatedAt: Date.now(),
     };
+
     if (editingId) {
       const idx = recipes.findIndex(x => x.id === editingId);
       if (idx !== -1) recipes[idx] = recipe;
     } else {
       recipes.unshift(recipe);
     }
+
     await persistRecipes(recipes);
+
     saveBtn.disabled = false;
     saveBtn.textContent = 'Lagre';
+
     closeForm();
     renderFilterBar();
     renderGrid(searchInput.value);
   }
 
+  // ── Delete ───────────────────────────────────────────────────────────────
   async function handleDelete() {
     if (!editingId) return;
     if (!confirm('Vil du slette denne oppskriften?')) return;
@@ -909,22 +1032,7 @@
     renderGrid(searchInput.value);
   }
 
-  fileInput.addEventListener('change', () => {
-    const files = Array.from(fileInput.files);
-    if (!files.length) return;
-    let loaded = 0;
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        pendingImages.push(e.target.result);
-        loaded++;
-        if (loaded === files.length) refreshUploadPreview();
-      };
-      reader.readAsDataURL(file);
-    });
-    fileInput.value = '';
-  });
-
+  // ── Event listeners ──────────────────────────────────────────────────────
   settingsBtn.addEventListener('click', openSettings);
   retryBtn.addEventListener('click', () => initLoad());
   closeSettingsBtn.addEventListener('click', closeSettings);
@@ -932,21 +1040,31 @@
   saveSettingsBtn.addEventListener('click', handleSaveSettings);
   clearGhBtn.addEventListener('click', handleClearGh);
   settingsModal.addEventListener('click', e => { if (e.target === settingsModal) closeSettings(); });
+
   newRecipeBtn.addEventListener('click', () => openForm());
   closeFormBtn.addEventListener('click', closeForm);
   cancelBtn.addEventListener('click', closeForm);
   saveBtn.addEventListener('click', handleSave);
   deleteBtn.addEventListener('click', handleDelete);
   addIngBtn.addEventListener('click', () => addIngredientRow());
+
   closeDetailBtn.addEventListener('click', closeDetail);
   closeDetailAct.addEventListener('click', closeDetail);
-  editFromDetail.addEventListener('click', () => { const id = detailRecipeId; closeDetail(); openForm(id); });
+  editFromDetail.addEventListener('click', () => {
+    const id = detailRecipeId;
+    closeDetail();
+    openForm(id);
+  });
+
   searchInput.addEventListener('input', () => renderGrid(searchInput.value));
+
   formModal.addEventListener('click', e => { if (e.target === formModal) closeForm(); });
   detailModal.addEventListener('click', e => { if (e.target === detailModal) closeDetail(); });
 
+  // ── Init ─────────────────────────────────────────────────────────────────
   initLoad();
 
+  // ── Service Worker ────────────────────────────────────────────────────────
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js');
   }
