@@ -10,22 +10,21 @@
       "Pasta eller makaroni",
       "Egg"
     ],
-    "instructions": "1.Kok egg i 8-10 minutter. Avkjøl i kaldt vann og skrell dem.\n\n2.Fres løk og hvitløk myk og blank i en kjele med litt olje.\n\n3.Tilsett tomatpuré, og la det surre ett minutt. Ha deretter i hakket tomat, vann, buljong og sukker. Kok opp og la det småkoke i ca. 10 minutter.\n\n4.Kjør suppen til ønsket konsistens med stavmikser eller i hurtigmikser. Tilsett hakket basilikum, og smak til med pepper.",
+    "instructions": "1.Kok egg i 8-10 minutter. AvkjÃ¸l i kaldt vann og skrell dem.\n\n2.Fres lÃ¸k og hvitlÃ¸k myk og blank i en kjele med litt olje.\n\n3.Tilsett tomatpurÃ©, og la det surre ett minutt. Ha deretter i hakket tomat, vann, buljong og sukker. Kok opp og la det smÃ¥koke i ca. 10 minutter.\n\n4.KjÃ¸r suppen til Ã¸nsket konsistens med stavmikser eller i hurtigmikser. Tilsett hakket basilikum, og smak til med pepper.",
     "updatedAt": 1785840635257
   },
   {
     "id": "mrntkb90jn8ihb75xk8",
     "name": "Okse indrefilet hel",
-    "mainIngredient": "Indrefilet",
+    "mainIngredient": "Okse",
     "date": "2026-07-16",
     "location": "Hytta",
     "ingredients": [
       "Okse indrefilet fra Reboli",
       "Bakte poteter"
     ],
-    "instructions": "Searing og deretter til 52 grader indirekte pÃ¥ Kamado. Steg til 57 grader under hvil ca 15 min. Ble helt perfekt medium og litt blod nÃ¥r trykket sammen.",
-    "images": [],
-    "updatedAt": 1784225111798
+    "instructions": "Searing og deretter til 52 grader indirekte på Kamado. Steg til 57 grader under hvil ca 15 min. Ble helt perfekt medium og litt blod når trykket sammen.",
+    "updatedAt": 1785841062980
   },
   {
     "id": "mrc9gymojn22f3j3le",
@@ -36,11 +35,11 @@
     "ingredients": [
       "Kyllingbryst",
       "Pasta",
-      "LÃ¸k og hvitlÃ¸k",
-      "FlÃ¸te",
+      "LÃÂ¸k og hvitlÃÂ¸k",
+      "FlÃÂ¸te",
       "Kyllingkraft"
     ],
-    "instructions": "1. Kok pastaen i godt saltet vann.\n2. Stek kyllingen i strimler, krydre med salt og pepper.\n3. Stek lÃ¸k og hvitlÃ¸k, tilsett flÃ¸te og kyllingkraft, la smÃ¥koke.\n4. Vend inn kylling og pasta. Server med parmesan.",
+    "instructions": "1. Kok pastaen i godt saltet vann.\n2. Stek kyllingen i strimler, krydre med salt og pepper.\n3. Stek lÃÂ¸k og hvitlÃÂ¸k, tilsett flÃÂ¸te og kyllingkraft, la smÃÂ¥koke.\n4. Vend inn kylling og pasta. Server med parmesan.",
     "images": [],
     "updatedAt": 1783585967753
   },
@@ -53,7 +52,7 @@
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur nÃ¥r ferdig er 58 grader. Men tÃ¥ler ogsÃ¥ opp mot 62 grader grunnet all marmoreringen. Husk at den stiger et par grader mens den hviler. Tok den ut pÃ¥ 57 og steg til 61 som var helt super.",
+    "instructions": "Kjernetemperatur nÃÂ¥r ferdig er 58 grader. Men tÃÂ¥ler ogsÃÂ¥ opp mot 62 grader grunnet all marmoreringen. Husk at den stiger et par grader mens den hviler. Tok den ut pÃÂ¥ 57 og steg til 61 som var helt super.",
     "images": [
       "images/mrbpzdb2vfn7okykpr-0.b64"
     ],
