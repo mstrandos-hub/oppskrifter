@@ -46,16 +46,13 @@
   {
     "id": "mrbpzdb2vfn7okykpr",
     "name": "Entrecote",
-    "mainIngredient": "Entrecote",
+    "mainIngredient": "Okse",
     "date": "2026-07-09",
     "location": "Hytta",
     "ingredients": [
       "Entrecote"
     ],
-    "instructions": "Kjernetemperatur nÃÂ¥r ferdig er 58 grader. Men tÃÂ¥ler ogsÃÂ¥ opp mot 62 grader grunnet all marmoreringen. Husk at den stiger et par grader mens den hviler. Tok den ut pÃÂ¥ 57 og steg til 61 som var helt super.",
-    "images": [
-      "images/mrbpzdb2vfn7okykpr-0.b64"
-    ],
-    "updatedAt": 1783618374708
+    "instructions": "Kjernetemperatur når ferdig er 58 grader. Men tåler også opp mot 62 grader grunnet all marmoreringen. Husk at den stiger et par grader mens den hviler. Tok den ut på 57 og steg til 61 som var helt super.",
+    "updatedAt": 1785841110828
   }
 ]
