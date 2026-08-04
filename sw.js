@@ -1,4 +1,4 @@
-const CACHE = 'oppskrifter-v2';
+const CACHE = 'oppskrifter-v3';
 const ASSETS = [
   './',
   './index.html',
