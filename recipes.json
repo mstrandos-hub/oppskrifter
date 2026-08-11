@@ -1,5 +1,17 @@
 [
   {
+    "id": "msosg2rr3ere80ugw91",
+    "name": "Skoleboller",
+    "mainIngredient": "Hvetemel",
+    "date": "2026-08-11",
+    "location": "Hjemme",
+    "ingredients": [
+      "flere ting, se oppskrift"
+    ],
+    "instructions": "https://www.matprat.no/oppskrifter/kos/skolebrod/",
+    "updatedAt": 1786460483080
+  },
+  {
     "id": "mslsihcg3f5n6qrrd83",
     "name": "Mørbrad på grill",
     "mainIngredient": "Okse",
