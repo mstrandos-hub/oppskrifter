@@ -138,6 +138,12 @@
     }
     .recipe-card:hover { border-color: #3b82d4; }
 
+    .recipe-card .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
     .recipe-card .card-body { padding: 14px; }
     .recipe-card .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
     .recipe-card .card-meta { font-size: 12px; color: #57606a; line-height: 1.7; }
@@ -333,6 +339,63 @@
       white-space: pre-wrap;
       line-height: 1.7;
     }
+    /* ── Image upload ── */
+    .img-upload-area {
+      border: 2px dashed #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      color: #57606a;
+      font-size: 13px;
+      transition: border-color 0.15s;
+      position: relative;
+    }
+    .img-upload-area:hover { border-color: #3b82d4; color: #3b82d4; }
+    .img-upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .img-preview-wrap {
+      position: relative;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .img-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 6px;
+      display: block;
+    }
+    .img-remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 13px;
+      line-height: 22px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* ── Detail image ── */
+    .detail-img {
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -390,6 +453,20 @@
     </div>
 
     <div class="form-group">
+      <label>Bilde</label>
+      <div class="img-upload-area" id="imgUploadArea">
+        <input type="file" id="fieldImage" accept="image/*" />
+        📷 Klikk for å laste opp bilde
+      </div>
+      <div id="imgPreviewWrap" style="display:none;">
+        <div class="img-preview-wrap">
+          <img id="imgPreview" class="img-preview" src="" alt="Forhåndsvisning" />
+          <button class="img-remove-btn" id="imgRemoveBtn" title="Fjern bilde">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
       <label for="fieldInstructions">Instruksjoner</label>
       <textarea id="fieldInstructions" rows="7" placeholder="Fremgangsmåte…"></textarea>
     </div>
@@ -409,6 +486,8 @@
   <div class="modal">
     <button class="close-btn" id="closeDetailBtn">✕</button>
     <div class="modal-title" id="detailTitle"></div>
+
+    <img id="detailImg" class="detail-img" src="" alt="" style="display:none;" />
 
     <div class="detail-meta-row" id="detailMeta"></div>
 
@@ -434,6 +513,7 @@
   const SUPABASE_URL  = 'https://wikdictegpnxyixhrtgb.supabase.co';
   const SUPABASE_KEY  = 'sb_publishable_KXQL6f8sRSClA1A4aec0Kg_ChSEYV4u';
   const TABLE         = 'recipes';
+  const BUCKET        = 'recipe-images';
 
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -451,6 +531,8 @@
   let editingId       = null;
   let detailRecipeId  = null;
   let activeIngFilter = null;
+  let pendingImageFile = null;   // File chosen in form but not yet uploaded
+  let currentImageUrl  = null;   // image_url of recipe being edited
 
   // ── DOM refs ─────────────────────────────────────────────────────────────
   const recipeGrid      = document.getElementById('recipeGrid');
@@ -472,6 +554,10 @@
   const ingredientList  = document.getElementById('ingredientList');
   const addIngBtn       = document.getElementById('addIngBtn');
   const formError       = document.getElementById('formError');
+  const fieldImage      = document.getElementById('fieldImage');
+  const imgPreviewWrap  = document.getElementById('imgPreviewWrap');
+  const imgPreview      = document.getElementById('imgPreview');
+  const imgRemoveBtn    = document.getElementById('imgRemoveBtn');
 
   const detailModal     = document.getElementById('detailModal');
   const closeDetailBtn  = document.getElementById('closeDetailBtn');
@@ -483,6 +569,7 @@
   const detailInstr     = document.getElementById('detailInstructions');
   const detailIngSec    = document.getElementById('detailIngSection');
   const detailInstSec   = document.getElementById('detailInstSection');
+  const detailImg       = document.getElementById('detailImg');
 
   // ── Utility ──────────────────────────────────────────────────────────────
   function formatDate(iso) {
@@ -539,6 +626,7 @@
       location:       row.location || '',
       ingredients:    row.ingredients || [],
       instructions:   row.instructions || '',
+      imageUrl:       row.image_url || '',
       updatedAt:      row.updated_at ? new Date(row.updated_at).getTime() : Date.now(),
     };
   }
@@ -552,8 +640,43 @@
       location:        r.location || null,
       ingredients:     r.ingredients || [],
       instructions:    r.instructions || null,
+      image_url:       r.imageUrl || null,
       updated_at:      new Date().toISOString(),
     };
+  }
+
+  // ── Image helpers ─────────────────────────────────────────────────────────
+
+  function showImgPreview(url) {
+    imgPreview.src = url;
+    imgPreviewWrap.style.display = '';
+  }
+
+  function clearImgPreview() {
+    imgPreview.src = '';
+    imgPreviewWrap.style.display = 'none';
+    fieldImage.value = '';
+    pendingImageFile = null;
+  }
+
+  async function uploadImage(recipeId, file) {
+    const ext  = file.name.split('.').pop();
+    const path = `${recipeId}.${ext}`;
+    const { error } = await db.storage.from(BUCKET).upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data } = db.storage.from(BUCKET).getPublicUrl(path);
+    // Append cache-busting timestamp so browsers reload after re-upload
+    return data.publicUrl + '?t=' + Date.now();
+  }
+
+  async function deleteImage(imageUrl) {
+    if (!imageUrl) return;
+    // Extract the storage path from the URL
+    const marker = `/object/public/${BUCKET}/`;
+    const idx = imageUrl.indexOf(marker);
+    if (idx === -1) return;
+    const path = imageUrl.slice(idx + marker.length).split('?')[0];
+    await db.storage.from(BUCKET).remove([path]);
   }
 
   // ── Render filter bar ─────────────────────────────────────────────────────
@@ -614,7 +737,12 @@
       if (recipe.location) metaParts.push(escHtml(recipe.location));
       metaParts.push(`${ingCount} ingrediens${ingCount !== 1 ? 'er' : ''}`);
 
+      const imgHTML = recipe.imageUrl
+        ? `<img class="card-img" src="${escHtml(recipe.imageUrl)}" alt="${escHtml(recipe.name)}" loading="lazy" />`
+        : '';
+
       card.innerHTML = `
+        ${imgHTML}
         <div class="card-body">
           ${badgeHTML}
           <div class="card-title">${escHtml(recipe.name)}</div>
@@ -651,6 +779,8 @@
     fieldLocation.value = '';
     fieldInstr.value = '';
     formError.style.display = 'none';
+    pendingImageFile = null;
+    clearImgPreview();
 
     if (id) {
       const r = recipes.find(x => x.id === id);
@@ -662,10 +792,13 @@
       fieldLocation.value = r.location || '';
       fieldInstr.value = r.instructions || '';
       (r.ingredients || []).forEach(i => addIngredientRow(i));
+      currentImageUrl = r.imageUrl || null;
+      if (currentImageUrl) showImgPreview(currentImageUrl);
     } else {
       formTitle.textContent = 'Ny oppskrift';
       deleteBtn.style.display = 'none';
       addIngredientRow();
+      currentImageUrl = null;
     }
 
     formModal.classList.add('open');
@@ -675,6 +808,9 @@
   function closeForm() {
     formModal.classList.remove('open');
     editingId = null;
+    pendingImageFile = null;
+    currentImageUrl = null;
+    clearImgPreview();
   }
 
   // ── Open / close detail ──────────────────────────────────────────────────
@@ -684,6 +820,14 @@
     detailRecipeId = id;
 
     detailTitle.textContent = r.name;
+
+    if (r.imageUrl) {
+      detailImg.src = r.imageUrl;
+      detailImg.alt = r.name;
+      detailImg.style.display = '';
+    } else {
+      detailImg.style.display = 'none';
+    }
 
     detailMeta.innerHTML = '';
     if (r.mainIngredient) {
@@ -737,14 +881,33 @@
     saveBtn.textContent = 'Lagrer…';
     setSyncStatus('busy', 'Lagrer…');
 
+    const recipeId = editingId || (Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+    // Upload image if a new file was chosen
+    let imageUrl = currentImageUrl || null;
+    if (pendingImageFile) {
+      try {
+        setSyncStatus('busy', 'Laster opp bilde…');
+        imageUrl = await uploadImage(recipeId, pendingImageFile);
+      } catch (e) {
+        formError.textContent = `Bildeopplasting feilet: ${e.message}`;
+        formError.style.display = '';
+        setSyncStatus('err', 'Opplastingsfeil');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Lagre';
+        return;
+      }
+    }
+
     const recipe = {
-      id:             editingId || (Date.now().toString(36) + Math.random().toString(36).slice(2)),
+      id:             recipeId,
       name,
       mainIngredient: fieldMainIng.value.trim(),
       date:           fieldDate.value,
       location:       fieldLocation.value.trim(),
       ingredients:    getIngredients(),
       instructions:   fieldInstr.value.trim(),
+      imageUrl:       imageUrl,
     };
 
     try {
@@ -783,8 +946,13 @@
     saveBtn.disabled = true;
     setSyncStatus('busy', 'Sletter…');
 
+    const recipeToDelete = recipes.find(x => x.id === editingId);
+
     try {
       await deleteRecipe(editingId);
+      if (recipeToDelete && recipeToDelete.imageUrl) {
+        await deleteImage(recipeToDelete.imageUrl);
+      }
     } catch (e) {
       formError.textContent = `Slettefeil: ${e.message}`;
       formError.style.display = '';
@@ -810,6 +978,20 @@
   saveBtn.addEventListener('click', handleSave);
   deleteBtn.addEventListener('click', handleDelete);
   addIngBtn.addEventListener('click', () => addIngredientRow());
+
+  fieldImage.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    pendingImageFile = file;
+    currentImageUrl = null;
+    showImgPreview(URL.createObjectURL(file));
+  });
+
+  imgRemoveBtn.addEventListener('click', () => {
+    pendingImageFile = null;
+    currentImageUrl = null;
+    clearImgPreview();
+  });
 
   closeDetailBtn.addEventListener('click', closeDetail);
   closeDetailAct.addEventListener('click', closeDetail);
